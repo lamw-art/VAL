@@ -11,7 +11,7 @@ class SubFind(Service):
         self.service_name = "子域名发现"
         self.task_describe = "收集子域名任务"
         self.domain = domain
-        self.subdomains = set()  # 存放发现的子域名
+        self.subdomains = set()  # 存放发现的子域名结果
         self.request = Http_Request()  # 初始化封装的request请求
         self.sub_dict = set()  # 子域名字典
 
