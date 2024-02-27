@@ -90,7 +90,7 @@ class SubFind(Service):
         self.crtsh()
         self.chinaz()
         self.securitytrails_api()
-        # self.burp()
+        self.burp()
         self.result_describe = f"共收集{len(self.subdomains)}个子域名"
         self.finsh()
         return self.subdomains
