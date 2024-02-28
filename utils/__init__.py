@@ -7,6 +7,23 @@ from utils.req import Http_Request
 from utils.user import *
 
 
+def check_code_fingerprint(input_data):
+    # 定义支持的字段
+    supported_fields = ["body", "title", "header", "icon_hash"]
+    # 定义支持的操作符
+    supported_operators = ["=", "==", "&&", "||", "!"]
+
+    # 构建正则表达式模式
+    pattern = re.compile(rf"\b({'|'.join(supported_fields)})\b\s*({', '.join(supported_operators)})\s*\"([^\"]*)\"")
+
+    # 检查输入是否符合规则
+    matches = re.findall(pattern, input_data)
+    if matches:
+        return True
+    else:
+        return False
+
+
 def match_subdomains(domain, html, fuzzy=True):
     """
     Use regexp to match subdomains
