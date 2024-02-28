@@ -60,7 +60,7 @@ def update_finger(finger_info: FingerInfo,
     try:
         flag, err = check_expression_with_error(finger_info.rule)
         if not flag:
-            raise HTTPException(status_code=400, detail="Invalid fingerprint rule syntax")
+            raise HTTPException(status_code=400, detail="不合法的指纹规则")
         if finger_info.id:
             obj_id = ObjectId(finger_info.id)
             existing_fingerprint = collection.find_one({'_id': obj_id})
@@ -71,7 +71,7 @@ def update_finger(finger_info: FingerInfo,
                 )
                 return JSONResponse({'code': 200, 'message': 'success'})
             else:
-                raise HTTPException(status_code=404, detail='Fingerprint not found')
+                raise HTTPException(status_code=404, detail='指纹未发现')
         else:
             collection.insert_one({"name": finger_info.name, "rule": finger_info.rule})
             return JSONResponse({'code': 200, 'message': 'Document inserted successfully'})
@@ -92,4 +92,4 @@ def delete_finger(delete: DeleteFingerRequest, current_user: dict = Depends(get_
     if result.deleted_count == 1:
         return {"code": 200, "message": "Deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="指纹ID未发现")
