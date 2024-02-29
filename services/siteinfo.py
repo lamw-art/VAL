@@ -5,7 +5,7 @@ from urllib.parse import urlsplit
 import aiohttp
 
 from config import settings, logger
-from service import Service
+from services.service import Service
 from services.subfind import SubFind
 from utils import get_title, get_headers, fetch_favicon, FingerPrintCache, finger_identify
 

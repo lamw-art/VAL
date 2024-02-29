@@ -13,6 +13,12 @@ celery = Celery(
     broker="redis://127.0.0.1:6379/",
     backend="redis://127.0.0.1:6379/",
 )
+celery.conf.beat_schedule = {
+    'asset_discovery': {
+        'task': 'asset_discover',
+        'schedule': '',
+    },
+}
 
 
 # 资产发现任务
@@ -45,7 +51,7 @@ def asset_discovery(self, asset_name, asset_target):
             sub_dict = {"subdomain": sub, "asset_id": asset_id, "domain": domain}
             # 添加到批量操作列表中
             sub_result.append(pymongo.UpdateOne({"subdomain": sub}, {"$set": sub_dict}, upsert=True))
-        new_subdomains_count = conn_db("subdomains").bulk_write(sub_result).upserted_count
+        new_subdomains_count = conn_db("subdomains").bulk_write(sub_result).upserted_count()
         # 执行站点探测任务
         site_info_list = SiteInfo(subdomains).run()
         site_result = []

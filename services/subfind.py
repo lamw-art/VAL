@@ -1,7 +1,7 @@
 import json
 
 from config import settings, logger
-from services import Service
+from services.service import Service
 from utils import Http_Request, match_subdomains, call_massdns
 
 

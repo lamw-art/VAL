@@ -21,8 +21,6 @@ def create_asset(params: asset_TaskParams, background_tasks: BackgroundTasks):
     params.target = params.target.split(',')
     celery.conf.beat_schedule["asset_discovery"]["schedule"] = params.timing
 
-    # 同步配置到 Celery Beat
-    Service.sync(celery)
     # 新建资产任务
     task_result = celerytask.asset_discovery.delay(
         params.asset_name, params.target
