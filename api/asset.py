@@ -72,3 +72,37 @@ def update_asset(asset_info: AssetInfo,
             raise HTTPException(status_code=404, detail='asset_id not found')
     except Exception as e:
         return JSONResponse({'code': 422, 'message': f'Error processing request: {str(e)}'})
+
+
+class DeleteParam(BaseModel):
+    id: str
+
+
+@asset_router.post("/asset/delete")
+def delete_asset(delete: DeleteParam, current_user: dict = Depends(get_current_user)):
+    asset_collection = conn_db("asset")
+    site_collection = conn_db("site")
+    subdomains_collection = conn_db("subdomains")
+    crawler_collection = conn_db("crawler")
+    jsfind_collection = conn_db("jsfind")
+    memo_collection = conn_db("memo")
+    port_collection = conn_db("port")
+    vul_collection = conn_db("vul")
+    asset_id = delete.id
+    subdomains_collection.delete_many({"asset_id": asset_id})
+    # 批量删除站点相关数据
+    site_ids = site_collection.find({'asset_id': asset_id})
+    site_ids = [str(document['_id']) for document in site_ids]
+    # 一次性删除多条记录，减少与数据库的通信次数
+    crawler_collection.delete_many({'site_id': {"$in": site_ids}})
+    jsfind_collection.delete_many({'site_id': {"$in": site_ids}})
+    memo_collection.delete_many({'site_id': {"$in": site_ids}})
+    port_collection.delete_many({'site_id': {"$in": site_ids}})
+    vul_collection.delete_many({'site_id': {"$in": site_ids}})
+    site_collection.delete_many({"asset_id": asset_id})
+    delete_asset_id = ObjectId(delete.id)
+    result = asset_collection.delete_one({"_id": delete_asset_id})
+    if result.deleted_count == 1:
+        return {"code": 200, "message": "Deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Item not found")

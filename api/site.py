@@ -21,7 +21,7 @@ def get_site_info(
         site_id: str = None,
         url: str = Query(None, description="Filter by url"),
         title: str = Query(None, description="Filter by rule"),
-        status_code: int = Query(None, description="Filter by status_code"),
+        status_code: str = Query(None, description="Filter by status_code"),
         finger: str = Query(None, description="Filter by status_code"),
         current_user: dict = Depends(get_current_user)
 ):
@@ -38,7 +38,7 @@ def get_site_info(
         # Use a case-insensitive regex for fuzzy rule matching
         query['title'] = {'$regex': f'.*{title}.*', '$options': 'i'}
     if status_code:
-        query['status_code'] = status_code
+        query['status_code'] = int(status_code)
     if finger:
         # 使用 $elemMatch 匹配 finger 数组中包含指定 name 的文档
         query['finger.name'] = {'$regex': f'.*{finger}.*', '$options': 'i'}

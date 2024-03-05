@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from celery.beat import Service
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter
 from pydantic import BaseModel
 
-from celerytask import celery
 import celerytask
+from celerytask import custom_celery
 
 task_router = APIRouter(tags=["任务管理"])
 
@@ -17,17 +16,13 @@ class asset_TaskParams(BaseModel):
 
 
 @task_router.post("/task/create_asset")
-def create_asset(params: asset_TaskParams, background_tasks: BackgroundTasks):
+def create_asset(params: asset_TaskParams):
     params.target = params.target.split(',')
-    celery.conf.beat_schedule["asset_discovery"]["schedule"] = params.timing
+    custom_celery.conf.beat_schedule["asset_discovery"]["schedule"] = params.timing
 
     # 新建资产任务
     task_result = celerytask.asset_discovery.delay(
         params.asset_name, params.target
-    )
-    # 打印任务celery id
-    background_tasks.add_task(
-        print, f"Task ID for {params.asset_name}: {str(task_result.id)}"
     )
     return {
         "code": 200,
@@ -73,6 +68,38 @@ class VulParams(BaseModel):
 def vul_scan(params: VulParams):
     task_result = celerytask.vul_scan.delay(
         params.site, params.level, params.poc_id, params.tags, params.site_id
+    )
+    return {"code": 200,
+            "message": "success start task!"
+            }
+
+
+class CrawlerParams(BaseModel):
+    site_id: str
+    url: str
+    cookie: str = None
+
+
+@task_router.post("/task/crawler")
+def crawler_scan(params: CrawlerParams):
+    task_result = celerytask.crawler.delay(
+        params.site_id, params.url, params.cookie
+    )
+    return {"code": 200,
+            "message": "success start task!"
+            }
+
+
+class jsfindParams(BaseModel):
+    site_id: str
+    url: str
+    cookie: str = None
+
+
+@task_router.post("/task/jsfind")
+def crawler_scan(params: jsfindParams):
+    task_result = celerytask.jsfind.delay(
+        params.site_id, params.url, params.cookie
     )
     return {"code": 200,
             "message": "success start task!"

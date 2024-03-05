@@ -23,6 +23,7 @@ class SiteInfo(Service):
         self.proxy = None
         if settings.proxy_enable:
             self.proxy = settings.aiohttp_proxy
+        self.semaphore = asyncio.Semaphore(20)
 
     @staticmethod
     def fetch_fingerprint(item, content):
@@ -42,7 +43,7 @@ class SiteInfo(Service):
 
     async def fetch_site_info(self, session, url):
         try:
-            async with session.get(url, headers=self.header, proxy=self.proxy) as response:
+            async with self.semaphore, session.get(url, headers=self.header, proxy=self.proxy) as response:
                 body = await response.read()
                 final_url = str(response.url)
                 normalized_url = urlsplit(final_url)._replace(query='', fragment='').geturl()

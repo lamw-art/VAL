@@ -1,10 +1,47 @@
 import subprocess
-
+from urllib.parse import urlparse
+import tldextract
 from utils.mongo import conn_db
 from utils.pagehandle import *
 from utils.fingerprint import *
 from utils.req import Http_Request
 from utils.user import *
+
+
+def get_main_domain(url):
+    # 使用 tldextract 提取主域
+    extracted = tldextract.extract(url)
+    main_domain = f"{extracted.domain}.{extracted.suffix}"
+
+    return main_domain
+
+
+def normal_url(url):
+    scheme_map = {
+        'http': 80,
+        "https": 443
+    }
+    o = urlparse(url)
+
+    scheme = o.scheme
+    hostname = o.hostname
+    path = o.path
+
+    if scheme not in scheme_map:
+        return ""
+
+    if o.path == "":
+        path = "/"
+
+    if o.port == scheme_map[o.scheme] or o.port is None:
+        ret_url = "{}://{}{}".format(scheme, hostname, path)
+    else:
+        ret_url = "{}://{}:{}{}".format(scheme, hostname, o.port, path)
+
+    if o.query:
+        ret_url = ret_url + "?" + o.query
+
+    return ret_url
 
 
 def check_code_fingerprint(input_data):
