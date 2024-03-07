@@ -11,7 +11,7 @@ crawler_router = APIRouter(tags=["动态爬虫管理"])
 
 @crawler_router.get("/crawler/info")
 def get_crawler_info(
-        site_id: str,
+        site_id: str = None,
         page: int = Query(1, ge=1),
         page_size: int = Query(20, le=100),
         url: str = None,

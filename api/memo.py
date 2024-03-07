@@ -7,12 +7,12 @@ from pydantic import BaseModel
 from utils import conn_db, check_expression_with_error
 from .user import get_current_user
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 memo_router = APIRouter(tags=["备忘录"])
 
 
 @memo_router.get("/memo/info")
-def get_finger_info(site_id: str = params.Query(...)):
+def get_memo_info(site_id: str = None, current_user: dict = Depends(get_current_user)):
     if site_id:
         query = {'site_id': site_id}
         memo_collection = conn_db("memo")

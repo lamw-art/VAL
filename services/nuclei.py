@@ -50,7 +50,7 @@ class Nuclei(Service):
         for item in file_list:
             with open(item, "r") as f:
                 data = yaml.safe_load(f)
-                existing_poc = conn_db("POC").find_one({'id': data['id']})
+                existing_poc = conn_db("POC").find_one({'poc_id': data['id']})
                 if not existing_poc:
                     conn_db("POC").insert_one({
                         "poc_id": data["id"],

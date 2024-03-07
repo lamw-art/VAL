@@ -23,7 +23,7 @@ class SiteInfo(Service):
         self.proxy = None
         if settings.proxy_enable:
             self.proxy = settings.aiohttp_proxy
-        self.semaphore = asyncio.Semaphore(20)
+        self.semaphore = asyncio.Semaphore(100)
 
     @staticmethod
     def fetch_fingerprint(item, content):

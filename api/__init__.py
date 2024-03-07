@@ -10,6 +10,7 @@ from api.tasks import task_router
 from api.memo import memo_router
 from api.crawler import crawler_router
 from api.jsfind import jsfind_router
+from api.vue import vue_router
 custom_api = APIRouter(prefix="/api")
 custom_api.include_router(user_router)
 custom_api.include_router(finger_router)
@@ -22,3 +23,6 @@ custom_api.include_router(task_router)
 custom_api.include_router(memo_router)
 custom_api.include_router(crawler_router)
 custom_api.include_router(jsfind_router)
+
+index_api = APIRouter()
+index_api.include_router(vue_router)

@@ -47,8 +47,13 @@ def loginout(current_user: dict = Depends(get_current_user)):
     }
 
 
+class passwdParam(BaseModel):
+    oldpassword: str
+    newpassword: str
+
+
 @user_router.post("/user/change_password")
-def change_password(old_password: str, new_password: str, current_user: dict = Depends(get_current_user)):
-    if not change_pass(current_user["token"], old_password, new_password):
-        return {"code": 0, "message": "error"}
+def change_password(param: passwdParam, current_user: dict = Depends(get_current_user)):
+    if not change_pass(current_user["token"], param.oldpassword, param.newpassword):
+        return {"code": 0, "message": "请检查输入是否存在问题"}
     return {"code": 200, "message": "success"}

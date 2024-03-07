@@ -11,7 +11,7 @@ jsfind_router = APIRouter(tags=["js敏感信息"])
 
 @jsfind_router.get("/jsfind/info")
 def get_crawler_info(
-        site_id: str,
+        site_id: str= None,
         page: int = Query(1, ge=1),
         page_size: int = Query(20, le=100),
         match_url: str = None,
@@ -47,19 +47,17 @@ def get_crawler_info(
 
 @jsfind_router.get("/jsfind/get_rules")
 def get_rules(
-        site_id: str,
+        site_id: str= None,
         current_user: dict = Depends(get_current_user)
 ):
     collection = conn_db("jsfind")
-
-    rules_from_db = collection.find({"site_id": site_id})
-
-    # 使用集合去重
-    unique_rules_set = set(rule["rule"] for rule in rules_from_db)
-
-    # 转换为列表
-    unique_rules_list = list(unique_rules_set)
-
+    unique_rules_list = []
+    if site_id:
+        rules_from_db = collection.find({"site_id": site_id})
+        # 使用集合去重
+        unique_rules_set = set(rule["rule"] for rule in rules_from_db)
+        # 转换为列表
+        unique_rules_list = list(unique_rules_set)
     # 返回去重后的规则列表
     return JSONResponse({'code': 200, 'data': unique_rules_list})
 
